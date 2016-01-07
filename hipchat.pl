@@ -98,7 +98,7 @@ GetOptions( "room|r=s"         => \$oRoom    ,
             "colour|color|c=s" => \$oColour  ,
             "debug|d=s"        => \$oDebug   ,
             "topic|t=s"        => \$oTopic
-    );
+          );
 
 ##############################
 ## VERIFY OPTIONS
@@ -106,63 +106,59 @@ GetOptions( "room|r=s"         => \$oRoom    ,
 
 #Check to verify that all options are valid before continuing.
 
-($oRoom eq "") &&  die "\tYou must specify a Hipchat room!\n\n$usage" ;
+($oRoom eq "") &&  die "\tYou must specify a Hipchat room!\n\n$usage"        ;
 
 ($oMessage eq "") && print "\tYou must specify a message to post!\n\n$usage" ;
 
 #Check that the API version is valid.
-$oAPI = $oAPI || $default_API                                      ;
+$oAPI = $oAPI || $default_API                                                ;
 
 foreach my $api (@valid_APIs) {
-    if (lc($oAPI) eq $api) {
-        $api_is_valid = 1                                           ;
-        $oAPI = $api                                           ;
-        last                                                        ;
-    }
+  if (lc($oAPI) eq $api) {
+    $api_is_valid = 1                                                        ;
+    $oAPI = $api                                                             ;
+    last                                                                     ;
+  }
 }
-$api_is_valid || print "\tYou must select a valid API version!\n\n$usage"               ;
+$api_is_valid || print "\tYou must select a valid API version!\n\n$usage"    ;
 
 #Check that the From name exists if using API v1.
 $oFrom eq "" && $oAPI eq "v1" &&
-  die "\tYou must specify a From name when using API v1!\n\n$usage" ;
+  die "\tYou must specify a From name when using API v1!\n\n$usage"          ;
 
 #Check that the message is shorter than $message_limit characters.
 length($oMessage) > $message_limit &&
-  die "\tMessage must be $message_limit characters or less!\n\n$usage" ;
+  die "\tMessage must be $message_limit characters or less!\n\n$usage"       ;
 
 #Check that the message type is valid.
-$oType = $oType || $default_type ;
+$oType = $oType || $default_type                                             ;
 
 foreach my $type (@valid_types) {
-    if (lc($oType) eq $type) {
-        $type_is_valid = 1                                          ;
-        $oType = $type                                         ;
-        last                                                        ;
-    }
+  if (lc($oType) eq $type) {
+    $type_is_valid = 1                                                       ;
+    $oType = $type                                                           ;
+    last                                                                     ;
+  }
 }
-$type_is_valid ||  die "\tYou must select a valid message type!\n\n$usage" ;
+$type_is_valid ||  die "\tYou must select a valid message type!\n\n$usage"   ;
 
 #Check if the notify option is set, else turn it off.
 if (lc($oNotify) eq "y" || lc($oNotify) eq "yes" || lc($oNotify) eq "true") {
-    if ($oAPI eq "v1") {
-        $oNotify = "1"                                         ;
-    } else {
-        $oNotify = "true"                                      ;
-    }
+  $oNotify = ($oAPI eq "v1") ? "1" : "true"
 } else {
-    $oNotify = "false"                                        ;
+  $oNotify = ($oAPI eq "v1") ? "0" : "false"                                 ;
 }
 
 #Check that the colour is valid.
-$oColour = $oColour || $default_colour ;
+$oColour = $oColour || $default_colour                                       ;
 foreach my $colour (@valid_colours) {
-    if (lc($oColour) eq $colour) {
-        $colour_is_valid = 1                                        ;
-        $oColour = $colour                                     ;
-        last                                                        ;
-    }
+  if (lc($oColour) eq $colour) {
+    $colour_is_valid = 1                                                     ;
+    $oColour = $colour                                                       ;
+    last                                                                     ;
+  }
 }
-$colour_is_valid || die "\tYou must select a valid colour!\n\n$usage" ;
+$colour_is_valid || die "\tYou must select a valid colour!\n\n$usage"        ;
 
 ##############################
 ### SUBMIT THE NOTIFICATION ##
@@ -176,30 +172,28 @@ $ua->timeout(10);
 
 #Set the proxy if it was specified.
 if ($oProxy ne "") {
-    $ua->proxy(['http', 'https', 'ftp'], $oProxy);
+  $ua->proxy(['http', 'https', 'ftp'], $oProxy);
 }
 
 #Submit the notification based on API version
 if ($oAPI eq "v1") {
-    $hipchat_url = "$hipchat_host\/$oAPI\/rooms/message";
+  $hipchat_url = "$hipchat_host\/$oAPI\/rooms/message";
 
-    $response            = $ua->post($hipchat_url , {
-        auth_token     => $oToken          ,
-        room_id        => $oRoom           ,
-        from           => $oFrom           ,
-        message        => $oMessage        ,
-        message_format => $oType           ,
-        notify         => $oNotify         ,
-        color          => $oColour         ,
-        format         => 'json'                ,
+  $response            = $ua->post($hipchat_url , {
+                                                   auth_token     => $oToken   ,
+                                                   room_id        => $oRoom    ,
+                                                   from           => $oFrom    ,
+                                                   message        => $oMessage ,
+                                                   message_format => $oType    ,
+                                                   notify         => $oNotify  ,
+                                                   color          => $oColour  ,
+                                                   format         => 'json'    ,
                                                   });
 } elsif ($oAPI eq "v2") {
   if ($oTopic) {
     $hipchat_url = sprintf ("$hipchat_host\/$oAPI\/room/$oRoom/topic?auth_token=$oToken" ,
                             $tokens->{SendNotif});
-    $hipchat_json     = encode_json({
-                                     topic          => $oTopic
-                                    });
+    $hipchat_json     = encode_json({topic => $oTopic});
     print "$hipchat_json$/";
     $request = HTTP::Request->new(POST => $hipchat_url) ;
     $request->content_type('application/json')          ;
