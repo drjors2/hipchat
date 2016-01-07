@@ -1,5 +1,5 @@
-hipchat-room-message-APIv2
-==========================
+hipchat (hipchat-room-message-APIv2)
+====================================
 
 This is a simple perl script that will use Hipchat's API v2 to message a room after passing in the room name, authentication token and a message. Also includes features for selecting the colour, notifying the room, passing in an html message, using a proxy and using API v1 should you so choose.
 
@@ -27,10 +27,14 @@ This script will send a notification to hipchat.
 
 		
 Sample Successful Call:
->$hipchat.pl -room Jenkins -token abc -message 'Hello World!' -colour green -proxy http://127.0.0.1:3128 
-Hipchat notification posted successfully.
+
+	>$hipchat.pl -room Jenkins -token abc -message 'Hello World!' -colour green -proxy http://127.0.0.1:3128 
+
+	Hipchat notification posted successfully.
 
 Sample Unsuccessful Call (bad token):
->$hipchat.pl -room Jenkins -token abd -message 'Hello World!' -colour green -proxy http://127.0.0.1:3128 
-Hipchat notification failed!
-401 Unauthorized
+
+	>$hipchat.pl -room Jenkins -token abd -message 'Hello World!' -colour green -proxy http://127.0.0.1:3128 
+
+	Hipchat notification failed!
+	401 Unauthorized
