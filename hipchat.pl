@@ -108,8 +108,12 @@ GetOptions( "room|r=s"         => \$oRoom    ,
 
 ($oRoom eq "") &&  die "\tYou must specify a Hipchat room!\n\n$usage"        ;
 
-($oMessage eq "") && print "\tYou must specify a message to post!\n\n$usage" ;
-
+my $cat;
+{local $/=undef; $cat=<>;};
+if ($oMessage eq "") {
+    die "\tYou must specify a message to post!\n\n$usage"  unless  ($cat =~ /\w+/) ; 
+    $oMessage = $cat;
+}
 #Check that the API version is valid.
 $oAPI = $oAPI || $default_API                                                ;
 
